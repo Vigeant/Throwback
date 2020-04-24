@@ -15,7 +15,8 @@ using namespace std;
 typedef bool (*PROGRESSPROC)(double);
 
 static const unsigned int INT_RETRYTIMES = 3;
-static wchar_t *SZ_AGENT = L"Mozilla/5.0 (compatible; MSIE 9.0; Windows NT 6.1; Trident/5.0)";
+//static wchar_t *SZ_AGENT = L"Mozilla/5.0 (compatible; MSIE 9.0; Windows NT 6.1; Trident/5.0)"; //original
+static wchar_t *SZ_AGENT = L"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/81.0.4044.113 Safari/537.36"; //cyberx2020 by vige
 static const int INT_BUFFERSIZE = 10240;    // Initial 10 KB temporary buffer, double if it is not enough.
 
 class WinHttpClient

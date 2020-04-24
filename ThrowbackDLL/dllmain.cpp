@@ -10,7 +10,6 @@ extern "C" HINSTANCE hAppInstance;
 extern "C" __declspec(dllexport) int __cdecl WPrintInit();
 EXTERN_C IMAGE_DOS_HEADER __ImageBase;
 
-
 DWORD RunDll()
 {
 	TCHAR strDllPath[MAX_PATH] = {0};

@@ -56,7 +56,7 @@ def main():
         else:
             raise
     except:
-        print __doc__
+        print(__doc__)
         sys.exit(0)
     
     todo = None
@@ -70,11 +70,11 @@ def main():
             for do in todo:
                 do = do.replace('\n', '')
                 do = do.replace('\r', '')
-                print "\n%s -> %s\n" % (do, encodeString(do))
+                print("\n%s -> %s\n" % (do, encodeString(do)))
         else:
             todo = todo.replace('\n', '')
             todo = todo.replace('\r', '')
-            print "\n%s -> %s\n" % (todo, encodeString(todo))
+            print("\n%s -> %s\n" % (todo, encodeString(todo)))
     
     elif operation == 'decode':
         
@@ -85,13 +85,13 @@ def main():
             for do in todo:
                 do = do.replace('\n', '')
                 do = do.replace('\r', '')
-                print "\n%s -> %s\n" % (do, decodeString(do))
+                print( "\n%s -> %s\n" % (do, decodeString(do)))
         else:
             todo = todo.replace('\n', '')
             todo = todo.replace('\r', '')
-            print "\n%s -> %s\n" % (todo, decodeString(todo))        
+            print( "\n%s -> %s\n" % (todo, decodeString(todo)))
     else:
-        print __doc__
+        print( __doc__)
         sys.exit(0)
 
 

@@ -1,0 +1,6 @@
+{
+  "callback": [
+    "https://www.example.com/index.php"
+  ],
+  "error_timeout": 1500
+}

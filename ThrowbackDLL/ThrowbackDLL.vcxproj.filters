@@ -36,6 +36,9 @@
     <ClInclude Include="..\Throwback\Throwback.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\auto_config.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">

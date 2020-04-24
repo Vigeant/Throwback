@@ -34,3 +34,13 @@ Icon
 # Files that might appear on external disk
 .Spotlight-V100
 .Trashes
+
+Release/
+Throwback/Release/
+Throwback/x64
+ThrowbackDLL/Release/
+ThrowbackDll/x64/
+bin/
+.vs/
+*.aps
+auto_config.h
